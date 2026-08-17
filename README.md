@@ -106,6 +106,7 @@ Stop the server anytime with `Ctrl + C`.
 | `npm run build` | Create a production build in `dist/` |
 | `npm run preview` | Preview the production build locally |
 | `npm run lint` | Run ESLint |
+| `npm run deploy` | Build and publish to Firebase Hosting |
 
 ### Production build example
 
@@ -115,6 +116,15 @@ npm run preview
 ```
 
 Then open the URL shown in the terminal (often `http://localhost:4173`).
+
+### Deploy to Firebase
+
+```bash
+npx firebase login
+npm run deploy
+```
+
+The live site is served from project `pdf-editor-60b0c`.
 
 ---
 

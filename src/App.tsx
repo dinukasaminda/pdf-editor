@@ -3,6 +3,7 @@ import { Sidebar } from './components/Sidebar'
 import { PdfPageView } from './components/PdfPageView'
 import { FullscreenPreview } from './components/FullscreenPreview'
 import { EmptyState } from './components/EmptyState'
+import { SiteFooter } from './components/SiteFooter'
 import {
   DEFAULT_ADJUSTMENTS,
   type PageSize,
@@ -13,7 +14,7 @@ import {
   loadImageFromFile,
   processSignature,
 } from './utils/signatureProcessor'
-import { downloadBlob, exportSignedPdf } from './utils/pdfExport'
+import { downloadBlob, exportSignedPdf, signedPdfFilename } from './utils/pdfExport'
 import { loadPdfDocument, renderPdfPage } from './utils/pdfRenderer'
 
 type RenderedPageState = {
@@ -31,6 +32,7 @@ export default function App() {
   const [sourceImage, setSourceImage] = useState<HTMLImageElement | null>(null)
   const [processedSignUrl, setProcessedSignUrl] = useState<string | null>(null)
   const [pdfBytes, setPdfBytes] = useState<ArrayBuffer | null>(null)
+  const [pdfName, setPdfName] = useState<string | null>(null)
   const [pages, setPages] = useState<RenderedPageState[]>([])
   const [placements, setPlacements] = useState<PlacedSignature[]>([])
   const [loadingPdf, setLoadingPdf] = useState(false)
@@ -105,6 +107,7 @@ export default function App() {
       if (requestId === pdfRequestRef.current) {
         setPages([])
         setPdfBytes(null)
+        setPdfName(null)
         setError(err instanceof Error ? err.message : 'Failed to render PDF')
       }
     } finally {
@@ -115,6 +118,7 @@ export default function App() {
   }
 
   async function handleUploadPdf(file: File) {
+    setPdfName(file.name)
     const bytes = await file.arrayBuffer()
     await renderPdfFromBytes(bytes)
   }
@@ -160,7 +164,7 @@ export default function App() {
         placements,
         pageSizes,
       )
-      downloadBlob(blob, 'signed-document.pdf')
+      downloadBlob(blob, signedPdfFilename(pdfName))
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save PDF')
     } finally {
@@ -169,31 +173,32 @@ export default function App() {
   }
 
   return (
-    <div className="grid h-dvh grid-rows-[auto_1fr] overflow-hidden md:grid-cols-[320px_1fr] md:grid-rows-none">
-      <Sidebar
-        adjustments={adjustments}
-        previewUrl={processedSignUrl}
-        pageCount={pages.length}
-        placementCount={placements.length}
-        loadingPdf={loadingPdf}
-        saving={saving}
-        onAdjustmentsChange={setAdjustments}
-        onUploadSign={handleUploadSign}
-        onUploadPdf={handleUploadPdf}
-        onPreview={() => setPreviewOpen(true)}
-        onSave={handleSave}
-        onClearPlacements={() => setPlacements([])}
-      />
+    <div className="flex h-dvh flex-col overflow-hidden">
+      <div className="grid min-h-0 flex-1 grid-rows-[auto_1fr] overflow-hidden md:grid-cols-[320px_1fr] md:grid-rows-none">
+        <Sidebar
+          adjustments={adjustments}
+          previewUrl={processedSignUrl}
+          pageCount={pages.length}
+          placementCount={placements.length}
+          loadingPdf={loadingPdf}
+          saving={saving}
+          onAdjustmentsChange={setAdjustments}
+          onUploadSign={handleUploadSign}
+          onUploadPdf={handleUploadPdf}
+          onPreview={() => setPreviewOpen(true)}
+          onSave={handleSave}
+          onClearPlacements={() => setPlacements([])}
+        />
 
-      <FullscreenPreview
-        open={previewOpen}
-        pages={pages}
-        signatureUrl={processedSignUrl}
-        placements={placements}
-        onClose={() => setPreviewOpen(false)}
-      />
+        <FullscreenPreview
+          open={previewOpen}
+          pages={pages}
+          signatureUrl={processedSignUrl}
+          placements={placements}
+          onClose={() => setPreviewOpen(false)}
+        />
 
-      <main className="flex min-h-0 flex-col overflow-hidden md:h-dvh">
+        <main className="flex min-h-0 flex-col overflow-hidden">
         <div className="shrink-0 border-b border-[var(--line)] bg-white/70 px-4 py-3 backdrop-blur sm:px-6">
           <div className="mx-auto flex max-w-4xl flex-wrap items-center justify-between gap-3">
             <h2 className="text-base font-semibold text-[var(--ink)]">
@@ -258,6 +263,8 @@ export default function App() {
           )}
         </div>
       </main>
+      </div>
+      <SiteFooter />
     </div>
   )
 }

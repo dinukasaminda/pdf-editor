@@ -25,3 +25,8 @@ dist-ssr
 
 # Local sample assets (do not commit)
 public/samples/
+
+# Firebase
+.firebase/
+firebase-debug.log
+firebase-debug.*.log

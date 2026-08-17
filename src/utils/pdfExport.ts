@@ -55,3 +55,10 @@ export function downloadBlob(blob: Blob, filename: string) {
   anchor.click()
   URL.revokeObjectURL(url)
 }
+
+export function signedPdfFilename(originalName?: string | null) {
+  const fallback = 'document.pdf'
+  const name = originalName?.trim() || fallback
+  const base = name.replace(/\.pdf$/i, '') || 'document'
+  return `${base}-signed.pdf`
+}

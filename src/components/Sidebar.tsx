@@ -31,7 +31,7 @@ export function Sidebar({
   onClearPlacements,
 }: Props) {
   return (
-    <aside className="flex h-auto max-h-[42dvh] flex-col gap-4 overflow-hidden border-b border-[var(--line)] bg-[var(--panel)]/95 p-4 backdrop-blur md:h-dvh md:max-h-none md:border-b-0 md:border-r">
+    <aside className="flex h-auto max-h-[42dvh] flex-col gap-4 overflow-hidden border-b border-[var(--line)] bg-[var(--panel)]/95 p-4 backdrop-blur md:h-full md:max-h-none md:border-b-0 md:border-r">
       <div className="shrink-0">
         <p className="text-xs font-semibold tracking-[0.18em] uppercase text-[var(--accent)]">
           SignPDF
